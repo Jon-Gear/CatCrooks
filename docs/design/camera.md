@@ -38,7 +38,7 @@ plays.
 
 `camera2`'s position calculation adds **brother 1's** `visual_middle` offset rather than
 brother 2's. It is a reference-frame bug that has been load-bearing for feel, and it is
-protected by an ADR in the original repo. **Keep it.**
+protected by [ADR-0003](../adr/0003-split-screen-10px-quirk.md). **Keep it.**
 
 ### Which half is which
 
@@ -111,4 +111,5 @@ CameraService.brother_facts()   # positions + alive flags, for the seam
 ```
 
 The camera never reaches into game state to find the brothers, and `GameSession` never
-holds a camera. This is the seam ADR-0004 in the original repo describes.
+holds a camera. This is the seam [ADR-0004](../adr/0004-single-split-screen-seam.md)
+describes.

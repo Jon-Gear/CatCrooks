@@ -1,0 +1,51 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://presentation/brothers/brother.gd" id="1_brother"]
+[ext_resource type="Script" path="res://presentation/ui/brother_health_bar.gd" id="2_healthbar"]
+[ext_resource type="Texture2D" path="res://assets/entities/players/red_brother_sheet_96x96.png" id="3_body"]
+[ext_resource type="Resource" path="res://domain/game_feel.tres" id="4_feel"]
+[ext_resource type="Texture2D" path="res://assets/UI/healthbar/HealthBar_Player.png" id="5_frame"]
+[ext_resource type="Texture2D" path="res://assets/UI/healthbar/health_bar_fill_player.png" id="6_fill"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
+radius = 5.0
+height = 20.0
+
+[node name="Brother" type="CharacterBody2D"]
+collision_layer = 1
+collision_mask = 1
+motion_mode = 1
+script = ExtResource("1_brother")
+feel = ExtResource("4_feel")
+facing_base_rotation = 1.5707963
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("3_body")
+region_enabled = true
+region_rect = Rect2(33, 37, 29, 59)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_body")
+
+[node name="HealthBar" type="Node2D" parent="."]
+script = ExtResource("2_healthbar")
+
+[node name="Frame" type="Sprite2D" parent="HealthBar"]
+texture = ExtResource("5_frame")
+centered = false
+
+[node name="Fill" type="Sprite2D" parent="HealthBar"]
+texture = ExtResource("6_fill")
+centered = false
+offset = Vector2(6, 5)
+region_enabled = true
+region_rect = Rect2(0, 0, 35, 7)
+
+[node name="Label" type="Label" parent="HealthBar"]
+offset_left = 0.0
+offset_top = 18.0
+offset_right = 48.0
+offset_bottom = 32.0
+theme_override_font_sizes/font_size = 8
+text = "100 / 100"
+horizontal_alignment = 1

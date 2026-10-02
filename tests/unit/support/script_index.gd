@@ -18,6 +18,8 @@ const NODE_REACHING_SINGLETONS := [
 	"Input", "AudioServer", "DisplayServer", "InputMap",
 ]
 
+const HEALTH_WRITE_PATTERN := "\\b(apply_damage|heal|fill)\\s*\\(|\\.(current|max_health)\\s*=(?!=)"
+
 const LAYER_ROOTS := [
 	"res://domain", "res://application", "res://infrastructure", "res://presentation",
 	"res://editor",
@@ -119,6 +121,14 @@ static func node_reaching_calls(source: String) -> Array:
 
 static func scene_preloads(source: String) -> Array:
 	return _matches(source, "\"[^\"]+\\.(tscn|scn)\"|'[^']+\\.(tscn|scn)'")
+
+
+static func health_writes(source: String) -> Array:
+	return _matches(source, HEALTH_WRITE_PATTERN)
+
+
+static func references(source: String, name: String) -> bool:
+	return not _matches(source, "\\b%s\\b" % name).is_empty()
 
 
 static func signature_types(source: String) -> Array:

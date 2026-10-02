@@ -3,6 +3,8 @@ extends "res://addons/gut/test.gd"
 const ScriptIndex = preload("res://tests/unit/support/script_index.gd")
 const GAME_SESSION := "res://presentation/game_session.gd"
 const LOGIC_LAYERS := ["res://domain", "res://application"]
+const SOURCE_LAYERS := ["res://domain", "res://application", "res://presentation", "res://infrastructure", "res://editor"]
+const INPUT_SEAM := "res://infrastructure/input_adapter.gd"
 
 var _index = ScriptIndex.new()
 
@@ -35,6 +37,21 @@ func test_no_domain_or_application_script_preloads_a_scene() -> void:
 	for path in _scripts_under(LOGIC_LAYERS):
 		var scenes: Array = ScriptIndex.scene_preloads(_index.source_of(path))
 		assert_eq(scenes, [], "%s preloads scene content: %s" % [path, scenes])
+
+
+func test_the_input_seam_is_the_only_script_that_touches_input() -> void:
+	assert_true(_index.source_of(INPUT_SEAM) != "", "%s is missing" % INPUT_SEAM)
+	var allowed := [INPUT_SEAM]
+	for path in _scripts_under(SOURCE_LAYERS):
+		if not _index.references(_index.source_of(path), "Input"):
+			continue
+		assert_true(path in allowed, "%s touches Input; only the InputAdapter may" % path)
+
+
+func test_no_presentation_script_writes_health() -> void:
+	for path in _scripts_under(["res://presentation"]):
+		var writes: Array = ScriptIndex.health_writes(_index.source_of(path))
+		assert_eq(writes, [], "%s writes Health: %s" % [path, writes])
 
 
 func test_game_session_holds_no_node_in_any_member_it_can_reach() -> void:
@@ -109,6 +126,35 @@ func a() -> void:
 func test_the_detector_catches_preloaded_scenes_only() -> void:
 	assert_eq(ScriptIndex.scene_preloads("const s = preload(\"res://level.tscn\")").size(), 1)
 	assert_eq(ScriptIndex.scene_preloads("const s = preload(\"res://domain/axe.tres\")"), [])
+
+
+func test_the_detector_catches_writes_to_health_and_leaves_reads_alone() -> void:
+	var writing := """
+func punish(health: Health) -> void:
+	health.apply_damage(10.0)
+	health.heal(5.0)
+	health.fill()
+	health.current = 0.0
+	health.max_health = 100.0
+"""
+	assert_eq(ScriptIndex.health_writes(writing).size(), 5)
+	var reading := """
+func observe(health: Health) -> void:
+	var ratio = health.current / health.max_health
+	if health.is_empty() or health.is_full():
+		draw(_fill_rect(ratio))
+"""
+	assert_eq(ScriptIndex.health_writes(reading), [])
+	assert_eq(ScriptIndex.health_writes("var is_over = health.current == 0.0\n"), [])
+	assert_eq(ScriptIndex.health_writes("var is_under = health.current >= 1.0\n"), [])
+
+
+func test_the_detector_catches_any_reference_to_a_named_singleton() -> void:
+	assert_true(ScriptIndex.references("var x = Input.is_action_pressed(\"fire\")", "Input"))
+	assert_true(ScriptIndex.references("var x = InputMap.get_action(\"fire\")", "InputMap"))
+	assert_false(ScriptIndex.references("var x = 1\n", "Input"))
+	assert_false(ScriptIndex.references("var input = read_intent()", "Input"))
+	assert_false(ScriptIndex.references("var x = _input.read_intent()", "Input"))
 
 
 func test_the_detector_catches_nodes_declared_in_signatures() -> void:

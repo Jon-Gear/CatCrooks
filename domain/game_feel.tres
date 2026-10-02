@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="GameFeel" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://domain/game_feel.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+friction = 0.1
+accel = 0.1
+extra_resistance = 0.3
+brother_max_speed = 675.0

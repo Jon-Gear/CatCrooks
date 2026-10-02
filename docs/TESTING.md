@@ -69,9 +69,10 @@ the test can call directly.
 There is one deliberate exception, `test_architecture_guards.gd`. The rules it holds —
 no `Node` and no `get_tree()` anywhere in `domain/` or `application/`, no scene
 preloaded into either, nothing `Node`-shaped or untyped reachable from a `GameSession`
-member, and `GameSession` exposing `GameState` and `services` and nothing else — are
-about the *shape* of the code, so there is no state to construct and no result to
-assert. It reads the layer scripts as text and asserts on the declarations it finds. It
+member, `GameSession` exposing `GameState` and `services` and nothing else, the
+`InputAdapter` being the one script in any layer allowed to touch `Input`, and no
+presentation script writing to `Health` — are about the *shape* of the code, so there is no state to construct and no
+result to assert. It reads the layer scripts as text and asserts on the declarations it finds. It
 boots no scene, never touches the `GameSession` autoload singleton, and asserts no node
 path. The reader it uses is itself covered by fixture tests in the same file, so a guard
 that quietly stopped detecting anything fails the suite instead of passing it.
@@ -92,7 +93,10 @@ knockback vectors, wave count formulas, ammo cycling, `GameState` transitions, a
 the payoff of [ADR-0001](adr/0001-one-way-dependency-rule.md).
 
 The first of them to land are `Health` and `GameState` — the two pieces of state every
-later service is written against.
+later service is written against. `MotionState`, `PlayerIntent`, and `PlayerActions`
+followed: movement interpolation and 8-way facing, one frame of normalized input, and the
+fixed per-brother action names. Reading a platform's input into a `PlayerIntent` needs a
+live `InputMap`, so it stays untested and is verified by playtest instead.
 
 ## 3. Test-only code does not ship
 

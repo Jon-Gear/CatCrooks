@@ -176,5 +176,6 @@ knows either existed.
 Because domain and application hold no Nodes, this is testable without a scene:
 `DropTable` weighted picks and normalization, `HitResolver` damage and knockback
 vectors, wave count formulas, ammo cycling, `GameState` transitions, `EnemyDefinition`
-behaviour transitions. The original had a GUT harness with two unit tests; this should
+behaviour transitions, `MotionState` interpolation and facing, and the `PlayerIntent` and
+`PlayerActions` input seam. The original had a GUT harness with two unit tests; this should
 be a real suite covering the domain and application layers.

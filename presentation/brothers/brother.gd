@@ -4,10 +4,8 @@ extends CharacterBody2D
 @export var player_number: int = PlayerActions.FIRST_PLAYER
 @export var max_health: float = 100.0
 @export var feel: GameFeel
-@export var facing_base_rotation: float = 0.0
 
-@onready var _sprite: Sprite2D = $Sprite2D
-@onready var _health_bar: BrotherHealthBar = $HealthBar
+@onready var _animator: BrotherAnimator = $Visuals
 
 var health: Health
 var motion: MotionState
@@ -24,7 +22,7 @@ func _ready() -> void:
 	motion = MotionState.new(feel.brother_max_speed, feel)
 	actions = PlayerActions.new(player_number)
 	_input = InputAdapter.new(actions)
-	_health_bar.bind(health)
+	$HealthBar.bind(health)
 
 
 func _physics_process(_delta: float) -> void:
@@ -34,10 +32,9 @@ func _physics_process(_delta: float) -> void:
 	motion.advance(intent.move_dir)
 	velocity = motion.velocity()
 	move_and_slide()
-	_face_the_way_it_last_moved()
+	_animator.animate(not intent.move_dir.is_zero_approx())
+	_animator.face(motion.facing)
 
 
-func _face_the_way_it_last_moved() -> void:
-	if motion.facing.is_zero_approx():
-		return
-	_sprite.rotation = facing_base_rotation + motion.facing.angle()
+func take_hit(p_from_front: bool) -> void:
+	_animator.flinch(p_from_front)

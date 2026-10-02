@@ -51,9 +51,8 @@ position = Vector2(400, 360)
 position = Vector2(880, 360)
 player_number = 2
 
-[node name="Sprite2D" parent="BrotherTwo" index="0"]
+[node name="Sprite2D" parent="BrotherTwo/Visuals" index="0"]
 texture = ExtResource("2_blue")
-region_rect = Rect2(34, 26, 28, 70)
 
 [node name="HealthBar" parent="BrotherTwo" index="2"]
 height_offset = -85.0
